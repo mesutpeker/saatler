@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eğlenceli Saatler</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Coiny&family=Fredoka+One&family=Open+Sans:wght@700&display=swap');
         
         body {
-            font-family: 'Baloo 2', cursive;
+            font-family: 'Open Sans', 'Arial', 'Helvetica', sans-serif;
             background-color: #f8e9fd;
             background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
             text-align: center;
@@ -25,7 +25,7 @@
             border: 5px solid #74b9ff;
         }
         h1 {
-            font-family: 'Fredoka One', cursive;
+            font-family: 'Coiny', system-ui, sans-serif;
             color: #ff6b6b;
             font-size: 42px;
             margin-bottom: 20px;
@@ -67,7 +67,7 @@
             font-size: 28px;
             font-weight: bold;
             color: #2d3436;
-            font-family: 'Fredoka One', cursive;
+            font-family: 'Coiny', system-ui, sans-serif;
         }
         .hour-hand, .minute-hand {
             position: absolute;
@@ -117,7 +117,7 @@
             flex-grow: 1;
             width: 100%;
             max-width: 350px;
-            font-family: 'Baloo 2', cursive;
+            font-family: 'Open Sans', 'Arial', 'Helvetica', sans-serif;
             font-weight: bold;
         }
         button:hover {
@@ -144,6 +144,7 @@
             margin-bottom: 15px;
             font-style: italic;
             color: #6c5ce7;
+            font-family: 'Open Sans', 'Arial', 'Helvetica', sans-serif;
         }
         .time-display {
             font-size: 38px;
@@ -156,7 +157,7 @@
             display: inline-block;
             box-shadow: 0 3px 0 #b2bec3;
             animation: pulse 2s infinite;
-            font-family: 'Fredoka One', cursive;
+            font-family: 'Fredoka One', system-ui, sans-serif;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -261,7 +262,7 @@
             margin-top: 10px;
             font-size: 22px;
             color: #0984e3;
-            font-family: 'Fredoka One', cursive;
+            font-family: 'Coiny', system-ui, sans-serif;
         }
         .current-time-display {
             margin: 15px 0;
@@ -276,7 +277,7 @@
             width: 90%;
             max-width: 350px;
             animation: glow 1.5s infinite alternate;
-            font-family: 'Fredoka One', cursive;
+            font-family: 'Fredoka One', system-ui, sans-serif;
         }
         @keyframes glow {
             from {box-shadow: 0 0 5px #e17055;}
@@ -319,6 +320,7 @@
             background-color: #f0f0f0;
             border-radius: 8px;
             flex-grow: 1;
+            font-family: 'Open Sans', 'Arial', 'Helvetica', sans-serif;
         }
         .am {
             color: #00b894;
@@ -571,8 +573,8 @@
             // 24 saatlik gösterim için
             const hour = Math.floor(Math.random() * 24); // 0-23 arası
             
-            // Eğitim amaçlı: Sadece tam saatler, çeyrekler ve yarımlar
-            const minutes = [0, 15, 30, 45];
+            // Eğitim amaçlı: Sadece 5'in katları olan dakikalar
+            const minutes = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
             const minute = minutes[Math.floor(Math.random() * minutes.length)];
             
             return { hour, minute };
@@ -663,8 +665,8 @@
             let hour12 = Math.round(hourAngle / 30) % 12;
             if (hour12 === 0) hour12 = 12;
             
-            // Dakika hesaplama
-            const minute = Math.round(minuteAngle / 6) % 60;
+            // Dakika hesaplama (5'er dakikalık adımlar için)
+            const minute = Math.round(minuteAngle / 30) * 5 % 60;
             
             // AM/PM durumunu kontrol et
             const amPmIndicator = document.getElementById("amPmIndicator");
@@ -691,9 +693,9 @@
             if (isPM && analogHour < 12) analog24Hour = analogHour + 12;
             if (!isPM && analogHour === 12) analog24Hour = 0;
             
-            // Dakikaları en yakın 15'in katına yuvarla
-            const targetMinuteRounded = Math.round(targetMinute / 15) * 15 % 60;
-            const analogMinuteRounded = Math.round(analogMinute / 15) * 15 % 60;
+            // 5'er dakikalık adımlar için yuvarlama
+            const targetMinuteRounded = Math.round(targetMinute / 5) * 5 % 60;
+            const analogMinuteRounded = Math.round(analogMinute / 5) * 5 % 60;
             
             console.log("Karşılaştırma:", analog24Hour, analogMinuteRounded, "vs", targetHour, targetMinuteRounded);
             
@@ -718,8 +720,8 @@
             let analogHour = Math.round(hourAngle / 30) % 12;
             if (analogHour === 0) analogHour = 12;
             
-            // Dakika hesaplama
-            const analogMinute = Math.round(minuteAngle / 6) % 60;
+            // Dakika hesaplama (5'er dakikalık adımlar için)
+            const analogMinute = Math.round(minuteAngle / 30) * 5 % 60;
             
             // AM/PM durumunu kontrol et
             const amPmIndicator = document.getElementById("amPmIndicator");
@@ -895,8 +897,8 @@
                 document.getElementById("hourHand").style.transform = `rotate(${hourAngle}deg)`;
                 updateCurrentTimeDisplay();
             } else if (dragType === "minute") {
-                // 6 derecelik adımlarla yuvarla (her adım 1 dakika, daha hassas) 
-                const minuteAngle = Math.round(adjustedAngle / 6) * 6;
+                // 30 derecelik adımlarla yuvarla (5'er dakika adımları için)
+                const minuteAngle = Math.round(adjustedAngle / 30) * 30;
                 document.getElementById("minuteHand").style.transform = `rotate(${minuteAngle}deg)`;
                 updateCurrentTimeDisplay();
             }
