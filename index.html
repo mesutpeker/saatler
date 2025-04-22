@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eğlenceli Saatler</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f8e9fd;
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            border: 5px solid #74b9ff;
+        }
+        h1 {
+            color: #ff6b6b;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0 #ffeaa7;
+        }
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .clock {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background-color: #fff;
+            background-image: radial-gradient(#ffeaa7, #fff);
+            border: 10px solid #74b9ff;
+            position: relative;
+            margin-bottom: 20px;
+            touch-action: none; /* Engelleme olmadan dokunmatik olayları */
+            z-index: 1; /* Saatin öne çıkmasını sağlıyoruz */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .center-point {
+            width: 20px;
+            height: 20px;
+            background-color: #2d3436;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        .number {
+            position: absolute;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3436;
+        }
+        .hour-hand, .minute-hand {
+            position: absolute;
+            transform-origin: bottom center;
+            z-index: 15;
+            border-radius: 10px;
+            top: 50%;
+            left: 50%;
+            cursor: grab;
+            touch-action: none; /* Dokunmatik için önemli */
+            box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s;
+        }
+        .hour-hand {
+            width: 14px;
+            height: 80px;
+            margin-top: -80px;
+            margin-left: -7px;
+            background-color: #2d3436;
+        }
+        .minute-hand {
+            width: 10px;
+            height: 120px;
+            margin-top: -120px;
+            margin-left: -5px;
+            background-color: #e17055;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        button {
+            background-color: #74b9ff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #0984e3;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background-color: #0984e3;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #0984e3;
+        }
+        .question-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ffeaa7;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 3px dashed #fdcb6e;
+        }
+        .feedback {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            min-height: 30px;
+        }
+        .message {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .time-display {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #2d3436;
+            background-color: #dfe6e9;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 3px 0 #b2bec3;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .option {
+            background-color: #ff7675;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: 0 3px 0 #d63031;
+        }
+        .option:hover, .option:active {
+            background-color: #d63031;
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 5px 0 #b71540;
+        }
+        .game-mode {
+            margin-top: 20px;
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6c5ce7;
+            margin-top: 20px;
+            background-color: #dfe6e9;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 10px;
+            border: 2px solid #6c5ce7;
+        }
+        /* Ana menü stilleri */
+        .main-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 10px;
+        }
+        .menu-button {
+            width: 80%;
+            max-width: 300px;
+            margin: 10px;
+            padding: 15px;
+            font-size: 20px;
+            background-color: #74b9ff;
+            border-radius: 15px;
+            box-shadow: 0 4px 0 #0984e3;
+        }
+        .menu-button:hover, .menu-button:active {
+            background-color: #0984e3;
+            transform: translateY(2px) scale(1.02);
+        }
+        /* Ekran bölümleri */
+        .screen {
+            display: none;
+        }
+        .active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        /* Geri butonu */
+        .back-button {
+            margin-top: 20px;
+            background-color: #fdcb6e;
+            box-shadow: 0 4px 0 #e17055;
+        }
+        .back-button:hover, .back-button:active {
+            background-color: #e17055;
+        }
+        /* Mobil geliştirmeler */
+        .hand-touch-hint {
+            display: none;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #81ecec;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #0984e3;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .target-title {
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 18px;
+            color: #0984e3;
+        }
+        .current-time-display {
+            margin: 10px 0;
+            padding: 8px 15px;
+            background-color: #74b9ff;
+            color: white;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            display: inline-block;
+            box-shadow: 0 3px 0 #0984e3;
+        }
+        .am-pm-toggle {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .am-pm-toggle button {
+            background-color: #74b9ff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #0984e3;
+            transition: all 0.2s;
+        }
+        .am-pm-toggle button:hover, .am-pm-toggle button:active {
+            background-color: #0984e3;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #0984e3;
+        }
+        .am-pm-toggle span {
+            margin: 0 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .am {
+            color: #00b894;
+        }
+        .pm {
+            color: #e17055;
+        }
+        @media (max-width: 600px) {
+            .clock {
+                width: 280px;
+                height: 280px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            .hour-hand, .minute-hand {
+                cursor: pointer;
+            }
+            .hour-hand {
+                width: 18px; /* Mobilde daha kalın akrep */
+                height: 70px;
+                margin-top: -70px;
+                margin-left: -9px;
+            }
+            .minute-hand {
+                width: 14px; /* Mobilde daha kalın yelkovan */
+                height: 100px;
+                margin-top: -100px;
+                margin-left: -7px;
+            }
+            .menu-button {
+                width: 100%;
+                padding: 20px 15px;
+            }
+            .hand-touch-hint {
+                display: block;
+            }
+            .option {
+                padding: 20px 25px; /* Daha büyük dokunma alanı */
+                margin: 5px;
+                font-size: 18px;
+            }
+            button {
+                padding: 15px 25px; /* Daha büyük dokunma alanı */
+                font-size: 16px;
+            }
+            .current-time-display {
+                font-size: 16px;
+                padding: 8px 10px;
+            }
+            /* Mobilde dokunmatik iyileştirme */
+            .number {
+                font-size: 26px;
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Eğlenceli Saatler</h1>
+        
+        <!-- Ana Menü Ekranı -->
+        <div id="mainMenu" class="screen active">
+            <div class="main-menu">
+                <button id="practiceModeBtn" class="menu-button">Saati Ayarlama Alıştırması</button>
+                <button id="gameModeBtn" class="menu-button">Saati Okuma Oyunu</button>
+            </div>
+        </div>
+        
+        <!-- Alıştırma Modu Ekranı (Saati Ayarlama) -->
+        <div id="practiceModeScreen" class="screen">
+            <div class="question-section" id="questionSection">
+                <div class="message" id="question">
+                    Bu saati ayarlayabilir misin? Akrep ve yelkovanı sürükle!
+                </div>
+                <div class="target-title">Ayarlanacak Saat:</div>
+                <div class="time-display" id="targetPracticeTime">--:--</div>
+            </div>
+            
+            <div class="clock-container">
+                <div class="clock">
+                    <div class="center-point"></div>
+                    <div class="hour-hand" id="hourHand"></div>
+                    <div class="minute-hand" id="minuteHand"></div>
+                    <!-- Saat rakamları JavaScript ile eklenecek -->
+                </div>
+                
+                <div class="hand-touch-hint">
+                    Akrep veya yelkovanı hareket ettirmek için üzerine dokun ve sürükle!
+                </div>
+                
+                <div class="current-time-display" id="currentTimeDisplay">
+                    Şu anki ayar: --:--
+                </div>
+                
+                <div class="am-pm-toggle">
+                    <button id="amPmToggle">Sabah/Akşam</button>
+                    <span id="amPmIndicator" class="am">Sabah</span>
+                </div>
+                
+                <div class="controls">
+                    <button id="checkBtn">Kontrol Et</button>
+                </div>
+                
+                <div class="feedback" id="feedback"></div>
+            </div>
+            
+            <button class="back-button" id="practiceModeBackBtn">Ana Menüye Dön</button>
+        </div>
+        
+        <!-- Oyun Modu Ekranı (Saati Okuma) -->
+        <div id="gameModeScreen" class="screen">
+            <div class="clock-container">
+                <div class="clock">
+                    <div class="center-point"></div>
+                    <div class="hour-hand" id="gameHourHand"></div>
+                    <div class="minute-hand" id="gameMinuteHand"></div>
+                    <!-- Saat rakamları JavaScript ile eklenecek -->
+                </div>
+            </div>
+            
+            <div class="game-mode">
+                <div class="message">Bu saati doğru okuyabilir misin?</div>
+                <div class="options" id="gameOptions">
+                    <!-- Seçenekler JavaScript ile eklenecek -->
+                </div>
+                <div class="feedback" id="gameFeedback"></div>
+                <div class="score" id="score">Puan: 0</div>
+            </div>
+            
+            <button class="back-button" id="gameModeBackBtn">Ana Menüye Dön</button>
+        </div>
+    </div>
+
+    <script>
+        // Saati oluştur
+        function createClock() {
+            // Tüm saat div'lerini seç
+            const clocks = document.querySelectorAll(".clock");
+            
+            // Her saat için rakamları oluştur
+            clocks.forEach(clock => {
+                // Önce saatin içini temizle (tekrar çağrılma durumları için)
+                const existingNumbers = clock.querySelectorAll(".number");
+                existingNumbers.forEach(num => num.remove());
+                
+                // Rakamları ekle
+                for (let i = 1; i <= 12; i++) {
+                    const angle = (i * 30) - 90; // 360 derece / 12 saat = 30 derece
+                    const number = document.createElement("div");
+                    number.className = "number";
+                    number.textContent = i;
+                    
+                    // Saat numaralarının konumu
+                    const radian = angle * (Math.PI / 180);
+                    const x = 130 * Math.cos(radian);
+                    const y = 130 * Math.sin(radian);
+                    
+                    number.style.left = `calc(50% + ${x}px)`;
+                    number.style.top = `calc(50% + ${y}px)`;
+                    number.style.transform = "translate(-50%, -50%)";
+                    
+                    clock.appendChild(number);
+                }
+            });
+        }
+
+        // Saati belirli bir saat ve dakikaya ayarla
+        function setClockHands(hour, minute, isGame = false) {
+            const prefix = isGame ? "game" : "";
+            const hourHand = document.getElementById(prefix + "HourHand");
+            const minuteHand = document.getElementById(prefix + "MinuteHand");
+            
+            if (!hourHand || !minuteHand) return;
+            
+            // Akrep için açı hesapla (saat + dakika/60 katkısı)
+            const hourAngle = ((hour % 12) * 30) + (minute * 0.5);
+            // Yelkovan için açı hesapla
+            const minuteAngle = minute * 6;
+            
+            hourHand.style.transform = `rotate(${hourAngle}deg)`;
+            minuteHand.style.transform = `rotate(${minuteAngle}deg)`;
+            
+            // Eğer oyun modu değilse ve saati gösterme alanı varsa güncelle
+            if (!isGame) {
+                updateCurrentTimeDisplay();
+            }
+        }
+
+        // Rastgele saat oluştur (24 saatlik düzen için)
+        function generateRandomTime() {
+            // 24 saatlik gösterim için
+            const hour = Math.floor(Math.random() * 24); // 0-23 arası
+            
+            // Eğitim amaçlı: Sadece tam saatler, çeyrekler ve yarımlar
+            const minutes = [0, 15, 30, 45];
+            const minute = minutes[Math.floor(Math.random() * minutes.length)];
+            
+            return { hour, minute };
+        }
+
+        // Çoktan seçmeli saat seçenekleri oluştur - SADECE OYUN MODU için
+        function createTimeOptions(correctTime) {
+            const optionsContainer = document.getElementById("gameOptions");
+            optionsContainer.innerHTML = "";
+            
+            // Doğru cevap ve 3 yanlış cevap
+            const allOptions = [correctTime];
+            
+            while (allOptions.length < 4) {
+                const randomTime = generateRandomTime();
+                // Yeni seçeneğin daha önce eklenenlere benzememesini sağla
+                if (!allOptions.some(option => 
+                    option.hour === randomTime.hour && option.minute === randomTime.minute)) {
+                    allOptions.push(randomTime);
+                }
+            }
+            
+            // Seçenekleri karıştır
+            shuffleArray(allOptions);
+            
+            // Seçenekleri ekle
+            allOptions.forEach(time => {
+                const option = document.createElement("div");
+                option.className = "option";
+                const formattedHour = time.hour.toString().padStart(2, "0");
+                const formattedMinute = time.minute.toString().padStart(2, "0");
+                
+                option.textContent = `${formattedHour}:${formattedMinute}`;
+                
+                option.addEventListener("click", () => {
+                    checkGameAnswer(time, correctTime);
+                });
+                
+                optionsContainer.appendChild(option);
+            });
+        }
+
+        // Dizileri karıştırmak için yardımcı fonksiyon
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // OYUN MODU - Seçilen cevabı kontrol et
+        function checkGameAnswer(selectedTime, correctTime) {
+            const feedback = document.getElementById("gameFeedback");
+            
+            if (selectedTime.hour === correctTime.hour && selectedTime.minute === correctTime.minute) {
+                feedback.textContent = "Harika! Doğru cevap! 🎉";
+                feedback.style.color = "#00b894";
+                
+                // Skoru güncelle
+                updateScore(true);
+                
+                // Bir sonraki soruyu göster
+                setTimeout(() => startGameRound(), 1500);
+            } else {
+                feedback.textContent = "Tekrar dene! Bu saati doğru okumayı öğreniyoruz! 🤔";
+                feedback.style.color = "#d63031";
+                
+                // Skoru güncelle
+                updateScore(false);
+            }
+        }
+
+        // Şu anki saat ayarını görüntüleme ekranını güncelle
+        function updateCurrentTimeDisplay() {
+            const currentTimeDisplay = document.getElementById("currentTimeDisplay");
+            if (!currentTimeDisplay) return;
+            
+            // Akrep ve yelkovanın açılarını al
+            const hourHand = document.getElementById("hourHand");
+            const minuteHand = document.getElementById("minuteHand");
+            
+            if (!hourHand || !minuteHand) return;
+            
+            const hourAngle = parseFloat(hourHand.style.transform.replace("rotate(", "").replace("deg)", "")) || 0;
+            const minuteAngle = parseFloat(minuteHand.style.transform.replace("rotate(", "").replace("deg)", "")) || 0;
+            
+            // Saat hesaplama (12 saatlik)
+            let hour12 = Math.round(hourAngle / 30) % 12;
+            if (hour12 === 0) hour12 = 12;
+            
+            // Dakika hesaplama
+            const minute = Math.round(minuteAngle / 6) % 60;
+            
+            // AM/PM durumunu kontrol et
+            const amPmIndicator = document.getElementById("amPmIndicator");
+            const isPM = amPmIndicator && amPmIndicator.classList.contains("pm");
+            
+            // 24 saatlik format hesaplama
+            let hour24 = hour12;
+            if (isPM && hour12 < 12) hour24 = hour12 + 12;
+            if (!isPM && hour12 === 12) hour24 = 0;
+            
+            const formattedHour = hour24.toString().padStart(2, "0");
+            const formattedMinute = minute.toString().padStart(2, "0");
+            
+            currentTimeDisplay.textContent = `Şu anki ayar: ${formattedHour}:${formattedMinute}`;
+            
+            // Konsola yazdır (Debug)
+            console.log("Anlık saat:", hour24, ":", minute, "AM/PM:", isPM ? "PM" : "AM");
+        }
+
+        // ÖZEL EŞLEŞME FONKSİYONU - Analog ve dijital saat uyumluluğu
+        function isClockTimeMatching(analogHour, analogMinute, targetHour, targetMinute, isPM) {
+            // Analog saatten 24 saatlik zaman hesaplama
+            let analog24Hour = analogHour;
+            if (isPM && analogHour < 12) analog24Hour = analogHour + 12;
+            if (!isPM && analogHour === 12) analog24Hour = 0;
+            
+            // Dakikaları en yakın 15'in katına yuvarla
+            const targetMinuteRounded = Math.round(targetMinute / 15) * 15 % 60;
+            const analogMinuteRounded = Math.round(analogMinute / 15) * 15 % 60;
+            
+            console.log("Karşılaştırma:", analog24Hour, analogMinuteRounded, "vs", targetHour, targetMinuteRounded);
+            
+            // Saat ve dakika eşleşmesini kontrol et
+            return analog24Hour === targetHour && analogMinuteRounded === targetMinuteRounded;
+        }
+
+        // ALIŞTİRMA MODU - Ayarlanan saati kontrol et 
+        function checkPracticeAnswer() {
+            const feedback = document.getElementById("feedback");
+            
+            // Açı değerlerine göre saat ve dakika değerlerini doğrudan hesapla
+            const hourHand = document.getElementById("hourHand");
+            const minuteHand = document.getElementById("minuteHand");
+            
+            if (!hourHand || !minuteHand) return;
+            
+            const hourAngle = parseFloat(hourHand.style.transform.replace("rotate(", "").replace("deg)", "")) || 0;
+            const minuteAngle = parseFloat(minuteHand.style.transform.replace("rotate(", "").replace("deg)", "")) || 0;
+            
+            // Saat hesaplama
+            let analogHour = Math.round(hourAngle / 30) % 12;
+            if (analogHour === 0) analogHour = 12;
+            
+            // Dakika hesaplama
+            const analogMinute = Math.round(minuteAngle / 6) % 60;
+            
+            // AM/PM durumunu kontrol et
+            const amPmIndicator = document.getElementById("amPmIndicator");
+            const isPM = amPmIndicator && amPmIndicator.classList.contains("pm");
+            
+            // Hedef zamanı al
+            const targetTimeDisplay = document.getElementById("targetPracticeTime").textContent;
+            const [targetHourStr, targetMinuteStr] = targetTimeDisplay.split(":");
+            const targetHour = parseInt(targetHourStr);
+            const targetMinute = parseInt(targetMinuteStr);
+            
+            console.log("Ayarlanan saat:", analogHour, ":", analogMinute, "AM/PM:", isPM ? "PM" : "AM");
+            console.log("Hedef saat:", targetHour, ":", targetMinute);
+            
+            // Özel eşleşme fonksiyonunu kullan
+            if (isClockTimeMatching(analogHour, analogMinute, targetHour, targetMinute, isPM)) {
+                feedback.textContent = "Harika! Saati doğru ayarladın! 🎉";
+                feedback.style.color = "#00b894";
+                
+                // 2 saniye sonra yeni bir hedef saat göster
+                setTimeout(() => {
+                    const newTarget = generateRandomTime();
+                    setTargetTime(newTarget);
+                    feedback.textContent = "";
+                }, 2000);
+            } else {
+                feedback.textContent = "Tekrar dene! Akrep ve yelkovanı doğru konuma getir! 🤔";
+                feedback.style.color = "#d63031";
+            }
+        }
+
+        // Sabah/Akşam durumunu değiştir
+        function toggleAmPm() {
+            const amPmIndicator = document.getElementById("amPmIndicator");
+            
+            if (amPmIndicator.classList.contains("am")) {
+                // AM -> PM
+                amPmIndicator.classList.remove("am");
+                amPmIndicator.classList.add("pm");
+                amPmIndicator.textContent = "Akşam";
+            } else {
+                // PM -> AM
+                amPmIndicator.classList.remove("pm");
+                amPmIndicator.classList.add("am");
+                amPmIndicator.textContent = "Sabah";
+            }
+            
+            // Güncel saat göstergesini güncelle
+            updateCurrentTimeDisplay();
+        }
+
+        // Oyun modu
+        let gameScore = 0;
+        
+        function startGameRound() {
+            // Saati rastgele bir şekilde ayarla
+            const randomTime = generateRandomTime();
+            setClockHands(randomTime.hour, randomTime.minute, true);
+            
+            // Feedback'i temizle
+            document.getElementById("gameFeedback").textContent = "";
+            
+            // Çoktan seçmeli soruyu oluştur
+            createTimeOptions(randomTime);
+        }
+        
+        function updateScore(isCorrect) {
+            if (isCorrect) {
+                gameScore += 10;
+            } else {
+                gameScore = Math.max(0, gameScore - 5);
+            }
+            document.getElementById("score").textContent = `Puan: ${gameScore}`;
+        }
+
+        // Alıştırma modu - Hedef zamanı ayarla
+        function setTargetTime(time) {
+            const targetTimeDisplay = document.getElementById("targetPracticeTime");
+            const formattedHour = time.hour.toString().padStart(2, "0");
+            const formattedMinute = time.minute.toString().padStart(2, "0");
+            targetTimeDisplay.textContent = `${formattedHour}:${formattedMinute}`;
+            document.getElementById("question").textContent = "Bu saati ayarlayabilir misin? Akrep ve yelkovanı sürükle!";
+        }
+
+        // Saati kullanıcı etkileşimiyle ayarla
+        let isDragging = false;
+        let dragType = null; // "hour" veya "minute"
+        let currentClock = null;
+        let currentIsGame = false;
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        function setupDraggableHands() {
+            // Alıştırma modu için akrep ve yelkovanı etkileşimli yap
+            const hourHand = document.getElementById("hourHand");
+            const minuteHand = document.getElementById("minuteHand");
+            
+            if (hourHand && minuteHand) {
+                setupHandInteraction(hourHand, "hour");
+                setupHandInteraction(minuteHand, "minute");
+            }
+        }
+        
+        function setupHandInteraction(element, type) {
+            element.addEventListener("mousedown", function(e) {
+                startDrag(e, type, element);
+            });
+            
+            element.addEventListener("touchstart", function(e) {
+                startDrag(e, type, element);
+            }, {passive: false});
+            
+            // Görsel geri bildirim ekle
+            element.addEventListener("mouseenter", function() {
+                element.style.filter = "brightness(1.2)";
+            });
+            
+            element.addEventListener("mouseleave", function() {
+                element.style.filter = "brightness(1)";
+            });
+        }
+        
+        function startDrag(e, type, element) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            isDragging = true;
+            dragType = type;
+            currentClock = element.closest(".clock");
+            
+            // Görsel geri bildirim
+            element.style.filter = "brightness(1.2)";
+            
+            // Dokunmatik veya fare koordinatları
+            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : null);
+            const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+            
+            if (clientX !== null && clientY !== null) {
+                touchStartX = clientX;
+                touchStartY = clientY;
+            }
+        }
+        
+        // Fare ve dokunmatik hareketleri için olay dinleyicileri
+        document.addEventListener("mousemove", handleMove);
+        document.addEventListener("touchmove", handleMove, {passive: false});
+        
+        function handleMove(e) {
+            if (!isDragging || !currentClock) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Fare veya dokunmatik olay koordinatlarını al
+            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : null);
+            const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+            
+            if (clientX === null || clientY === null) return;
+            
+            const rect = currentClock.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            // Merkez ile fare/dokunma noktası arasındaki açıyı hesapla
+            const angle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+            // Açı düzeltmesi (saat 12 pozisyonu 0 derece olsun)
+            let adjustedAngle = (angle + 90) % 360;
+            if (adjustedAngle < 0) adjustedAngle += 360;
+            
+            if (dragType === "hour") {
+                // 30 derecelik adımlarla yuvarla (her adım 1 saat)
+                const hourAngle = Math.round(adjustedAngle / 30) * 30;
+                document.getElementById("hourHand").style.transform = `rotate(${hourAngle}deg)`;
+                updateCurrentTimeDisplay();
+            } else if (dragType === "minute") {
+                // 6 derecelik adımlarla yuvarla (her adım 1 dakika, daha hassas) 
+                const minuteAngle = Math.round(adjustedAngle / 6) * 6;
+                document.getElementById("minuteHand").style.transform = `rotate(${minuteAngle}deg)`;
+                updateCurrentTimeDisplay();
+            }
+        }
+        
+        // Fare ve dokunmatik bırakma için olay dinleyicileri
+        document.addEventListener("mouseup", endDrag);
+        document.addEventListener("touchend", endDrag);
+        
+        function endDrag() {
+            if (isDragging) {
+                // Görsel geri bildirimi sıfırla
+                if (dragType === "hour") {
+                    document.getElementById("hourHand").style.filter = "brightness(1)";
+                } else if (dragType === "minute") {
+                    document.getElementById("minuteHand").style.filter = "brightness(1)";
+                }
+            }
+            
+            isDragging = false;
+            dragType = null;
+            currentClock = null;
+            touchStartX = 0;
+            touchStartY = 0;
+        }
+        
+        function getCurrentTimeFromHands(isGame = false) {
+            const prefix = isGame ? "game" : "";
+            const hourHand = document.getElementById(prefix + "HourHand");
+            const minuteHand = document.getElementById(prefix + "MinuteHand");
+            
+            if (!hourHand || !minuteHand) return { hour: 0, minute: 0 };
+            
+            const hourAngle = parseFloat(hourHand.style.transform.replace("rotate(", "").replace("deg)", "")) || 0;
+            const minuteAngle = parseFloat(minuteHand.style.transform.replace("rotate(", "").replace("deg)", "")) || 0;
+            
+            let hour = Math.round(hourAngle / 30) % 12;
+            if (hour === 0) hour = 12;
+            
+            let minute = Math.round(minuteAngle / 15) * 15 % 60; // 15 dakikalık adımlara yuvarla
+            
+            return { hour, minute };
+        }
+
+        // Ekranlar arası geçiş
+        function switchScreen(screenId) {
+            // Tüm ekranları gizle
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // İstenen ekranı göster
+            document.getElementById(screenId).classList.add('active');
+            
+            // Ekran değiştiğinde saatleri yeniden oluştur
+            createClock();
+            
+            // Ekrana özgü başlatma işlemleri
+            if (screenId === "practiceModeScreen") {
+                // Alıştırma modunu başlat
+                const targetTime = generateRandomTime();
+                setClockHands(3, 0); // Başlangıç saati olarak 3:00
+                setTargetTime(targetTime);
+                document.getElementById("feedback").textContent = "";
+                
+                // AM/PM durumunu başlangıçta AM yap
+                const amPmIndicator = document.getElementById("amPmIndicator");
+                if (amPmIndicator) {
+                    amPmIndicator.classList.remove("pm");
+                    amPmIndicator.classList.add("am");
+                    amPmIndicator.textContent = "Sabah";
+                }
+                
+                updateCurrentTimeDisplay();
+                
+                // Akrep ve yelkovanı etkileşimli yap
+                setupDraggableHands();
+            } else if (screenId === "gameModeScreen") {
+                // Oyun modunu başlat
+                gameScore = 0;
+                document.getElementById("score").textContent = "Puan: 0";
+                startGameRound();
+            }
+        }
+
+        // Sayfayı yükledikten sonra uygulamayı başlat
+        window.addEventListener("DOMContentLoaded", () => {
+            // Ana menü butonları
+            document.getElementById("practiceModeBtn").addEventListener("click", () => {
+                switchScreen("practiceModeScreen");
+            });
+            
+            document.getElementById("gameModeBtn").addEventListener("click", () => {
+                switchScreen("gameModeScreen");
+            });
+            
+            // Geri butonları
+            document.getElementById("practiceModeBackBtn").addEventListener("click", () => {
+                switchScreen("mainMenu");
+            });
+            
+            document.getElementById("gameModeBackBtn").addEventListener("click", () => {
+                switchScreen("mainMenu");
+            });
+            
+            // Sabah/Akşam düğmesi
+            document.getElementById("amPmToggle").addEventListener("click", toggleAmPm);
+            
+            // Saat oluştur
+            createClock();
+            
+            // Kontrol et düğmesi
+            document.getElementById("checkBtn").addEventListener("click", () => {
+                checkPracticeAnswer();
+            });
+        });
+    </script>
+</body>
+</html> 
