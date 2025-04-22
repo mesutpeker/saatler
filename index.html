@@ -138,6 +138,24 @@
             font-size: 24px;
             font-weight: bold;
             min-height: 30px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            display: none;
+            animation: feedbackAnimation 2s ease-in-out;
+        }
+        
+        @keyframes feedbackAnimation {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
         }
         .message {
             font-size: 16px;
@@ -635,18 +653,28 @@
             if (selectedTime.hour === correctTime.hour && selectedTime.minute === correctTime.minute) {
                 feedback.textContent = "Harika! Doğru cevap! 🎉";
                 feedback.style.color = "#00b894";
+                feedback.style.display = "block";
                 
                 // Skoru güncelle
                 updateScore(true);
                 
-                // Bir sonraki soruyu göster
-                setTimeout(() => startGameRound(), 1500);
+                // Animasyon gösterdikten sonra gizle ve bir sonraki soruyu göster
+                setTimeout(() => {
+                    feedback.style.display = "none";
+                    startGameRound();
+                }, 2000);
             } else {
                 feedback.textContent = "Tekrar dene! Bu saati doğru okumayı öğreniyoruz! 🤔";
                 feedback.style.color = "#d63031";
+                feedback.style.display = "block";
                 
                 // Skoru güncelle
                 updateScore(false);
+                
+                // 2 saniye sonra geri bildirim mesajını gizle
+                setTimeout(() => {
+                    feedback.style.display = "none";
+                }, 2000);
             }
         }
 
@@ -743,16 +771,23 @@
             if (isClockTimeMatching(analogHour, analogMinute, targetHour, targetMinute, isPM)) {
                 feedback.textContent = "Harika! Saati doğru ayarladın! 🎉";
                 feedback.style.color = "#00b894";
+                feedback.style.display = "block";
                 
-                // 2 saniye sonra yeni bir hedef saat göster
+                // 2 saniye sonra yeni bir hedef saat göster ve geri bildirimi gizle
                 setTimeout(() => {
                     const newTarget = generateRandomTime();
                     setTargetTime(newTarget);
-                    feedback.textContent = "";
+                    feedback.style.display = "none";
                 }, 2000);
             } else {
                 feedback.textContent = "Tekrar dene! Akrep ve yelkovanı doğru konuma getir! 🤔";
                 feedback.style.color = "#d63031";
+                feedback.style.display = "block";
+                
+                // 2 saniye sonra geri bildirimi gizle
+                setTimeout(() => {
+                    feedback.style.display = "none";
+                }, 2000);
             }
         }
 
@@ -965,7 +1000,7 @@
                 const targetTime = generateRandomTime();
                 setClockHands(3, 0); // Başlangıç saati olarak 3:00
                 setTargetTime(targetTime);
-                document.getElementById("feedback").textContent = "";
+                document.getElementById("feedback").style.display = "none";
                 
                 // AM/PM durumunu başlangıçta AM yap
                 const amPmIndicator = document.getElementById("amPmIndicator");
@@ -983,6 +1018,7 @@
                 // Oyun modunu başlat
                 gameScore = 0;
                 document.getElementById("score").textContent = "Puan: 0";
+                document.getElementById("gameFeedback").style.display = "none";
                 startGameRound();
             }
         }
