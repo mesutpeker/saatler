@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eğlenceli Saatler</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Dancing+Script:wght@700&display=swap');
+        
         body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Bubblegum Sans', cursive;
             background-color: #f8e9fd;
             background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
             text-align: center;
@@ -23,8 +25,9 @@
             border: 5px solid #74b9ff;
         }
         h1 {
+            font-family: 'Dancing Script', cursive;
             color: #ff6b6b;
-            font-size: 36px;
+            font-size: 42px;
             margin-bottom: 20px;
             text-shadow: 2px 2px 0 #ffeaa7;
         }
@@ -61,9 +64,10 @@
         }
         .number {
             position: absolute;
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
             color: #2d3436;
+            font-family: 'Dancing Script', cursive;
         }
         .hour-hand, .minute-hand {
             position: absolute;
@@ -129,20 +133,23 @@
             min-height: 30px;
         }
         .message {
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 15px;
+            font-style: italic;
+            color: #6c5ce7;
         }
         .time-display {
-            font-size: 32px;
+            font-size: 38px;
             font-weight: bold;
             margin: 20px 0;
             color: #2d3436;
             background-color: #dfe6e9;
-            padding: 10px 20px;
+            padding: 10px 25px;
             border-radius: 10px;
             display: inline-block;
             box-shadow: 0 3px 0 #b2bec3;
             animation: pulse 2s infinite;
+            font-family: 'Dancing Script', cursive;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -245,8 +252,9 @@
         .target-title {
             font-weight: bold;
             margin-top: 10px;
-            font-size: 18px;
+            font-size: 22px;
             color: #0984e3;
+            font-family: 'Dancing Script', cursive;
         }
         .current-time-display {
             margin: 10px 0;
@@ -264,6 +272,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-wrap: wrap;
         }
         .am-pm-toggle button {
             background-color: #74b9ff;
@@ -275,6 +284,7 @@
             cursor: pointer;
             box-shadow: 0 4px 0 #0984e3;
             transition: all 0.2s;
+            margin: 5px;
         }
         .am-pm-toggle button:hover, .am-pm-toggle button:active {
             background-color: #0984e3;
@@ -285,6 +295,8 @@
             margin: 0 10px;
             font-size: 18px;
             font-weight: bold;
+            display: inline-block;
+            padding: 5px;
         }
         .am {
             color: #00b894;
@@ -293,12 +305,21 @@
             color: #e17055;
         }
         @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px 10px;
+                border-width: 3px;
+            }
             .clock {
                 width: 280px;
                 height: 280px;
+                margin-bottom: 15px;
             }
             h1 {
-                font-size: 28px;
+                font-size: 36px;
+                margin-bottom: 15px;
             }
             .hour-hand, .minute-hand {
                 cursor: pointer;
@@ -321,6 +342,8 @@
             }
             .hand-touch-hint {
                 display: block;
+                padding: 8px;
+                font-size: 14px;
             }
             .option {
                 padding: 20px 25px; /* Daha büyük dokunma alanı */
@@ -328,17 +351,42 @@
                 font-size: 18px;
             }
             button {
-                padding: 15px 25px; /* Daha büyük dokunma alanı */
+                padding: 12px 20px; /* Daha büyük dokunma alanı */
                 font-size: 16px;
+                margin-bottom: 10px;
             }
             .current-time-display {
                 font-size: 16px;
                 padding: 8px 10px;
+                margin: 5px 0;
             }
             /* Mobilde dokunmatik iyileştirme */
             .number {
                 font-size: 26px;
                 font-weight: bold;
+            }
+            /* Mobilde düğmelerin görünmesi için ekstra alan */
+            .controls, .am-pm-toggle {
+                margin-bottom: 20px;
+            }
+            .question-section {
+                padding: 15px 10px;
+                margin-top: 15px;
+            }
+            .time-display {
+                font-size: 32px;
+                padding: 8px 15px;
+            }
+            .message {
+                font-size: 16px;
+            }
+            .target-title {
+                font-size: 18px;
+            }
+            /* Sayfanın alt kısmına daha fazla boşluk ekle */
+            .back-button {
+                margin-top: 15px;
+                margin-bottom: 30px;
             }
         }
     </style>
